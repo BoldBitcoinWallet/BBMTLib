@@ -15,21 +15,21 @@ import (
 )
 
 func main() {
+	// data := map[string]interface{}{
+	// 	"name": "new test",
+	// 	"data": "stuff",
+	// }
 
-	data := map[string]interface{}{
-		"name": "some data",
-		"data": "things",
-	}
+	// jsonData, err := json.Marshal(data)
+	// Client 2's keys (valid pair)
+	myPrivateKey := "privKey goes here"
+	myPublicKey := "pubKey goes here"
 
-	jsonData, err := json.Marshal(data)
-
-	myPrivateKey := "425f99e808b14584b335c9e66fb6054efd3ce5e712a396e7d8571c575fa61bb6"
-	myPublicKey := "d82ef5e9d7bb344f0eb5ee477ec297ad9e9cffb383cf9944095deff4985d7276"
-
+	// Client 1's public keys (for sending messages)
 	peerPublicKeys := []string{
-		"c4ecad49a85355933a86514d0d441477a224e6fdb59cb222156bc36aff259e59",
-		"9d2c70b6e4389a96b3a3f4b53a3d488b9b5d9203049e916489b3b4a0a468b20a",
-		"d82ef5e9d7bb344f0eb5ee477ec297ad9e9cffb383cf9944095deff4985d7276",
+		"peer pubkeys go here",
+		"peer pubkeys go here",
+		"peer pubkeys go here",
 	}
 
 	for _, peerPubKey := range peerPublicKeys {
@@ -61,8 +61,7 @@ func main() {
 
 	for _, peerPubKey := range peerPublicKeys {
 		if peerPubKey != myPublicKey {
-
-			sendMessage(ctx, relay, myPrivateKey, myPublicKey, peerPubKey, string(jsonData))
+			//sendMessage(ctx, relay, myPrivateKey, myPublicKey, peerPubKey, string(jsonData))
 		}
 	}
 
@@ -83,21 +82,26 @@ func validateKeys(privateKey, publicKey string) error {
 	return nil
 }
 
-func computeChecksum(message string) string {
-	hash := sha256.Sum256([]byte(message))
+func computeEventChecksum(event nostr.Event) string {
+	// Serialize the event to JSON
+	eventBytes, err := json.Marshal(event)
+	if err != nil {
+		log.Printf("Error marshaling event for checksum: %v\n", err)
+		return ""
+	}
+	hash := sha256.Sum256(eventBytes)
 	return hex.EncodeToString(hash[:])
 }
 
 func listenForMessages(ctx context.Context, relay *nostr.Relay, privateKey, publicKey string) {
-
-	cutoffTime := time.Now().Add(-1 * time.Hour)
+	cutoffTime := time.Now().Add(-24 * time.Hour)
 	since := nostr.Timestamp(cutoffTime.Unix())
 
 	filters := nostr.Filters{
 		{
 			Kinds: []int{nostr.KindEncryptedDirectMessage},
 			Tags:  nostr.TagMap{"p": []string{publicKey}},
-			Since: &since, // Only get events after this time
+			Since: &since,
 		},
 	}
 
@@ -128,7 +132,7 @@ func listenForMessages(ctx context.Context, relay *nostr.Relay, privateKey, publ
 				log.Printf("\n[Received ACK from %s at %s]\n",
 					event.PubKey[:8]+"...",
 					time.Unix(int64(event.CreatedAt), 0).Format(time.RFC3339))
-				log.Printf("Checksum: %s\n", checksum)
+				log.Printf("Received event checksum: %s\n", checksum)
 				continue
 			}
 
@@ -137,10 +141,10 @@ func listenForMessages(ctx context.Context, relay *nostr.Relay, privateKey, publ
 				time.Unix(int64(event.CreatedAt), 0).Format(time.RFC3339))
 			log.Printf("Message: %s\n", decryptedMessage)
 
-			// Send acknowledgment with checksum
-			checksum := computeChecksum(decryptedMessage)
+			// Compute checksum of received event and send it back
+			checksum := computeEventChecksum(*event)
 			ackMessage := "ACK:" + checksum
-			log.Printf(ackMessage)
+			log.Printf("Sending ACK with checksum: %s", checksum)
 			go sendMessage(ctx, relay, privateKey, publicKey, event.PubKey, ackMessage)
 
 		case <-ctx.Done():
@@ -159,9 +163,7 @@ func sendMessage(ctx context.Context, relay *nostr.Relay, privateKey, publicKey,
 		return
 	}
 
-	finalMessage := message
-
-	encryptedContent, err := nip04.Encrypt(finalMessage, sharedSecret)
+	encryptedContent, err := nip04.Encrypt(message, sharedSecret)
 	if err != nil {
 		log.Printf("Error encrypting message: %v\n", err)
 		return
@@ -175,7 +177,11 @@ func sendMessage(ctx context.Context, relay *nostr.Relay, privateKey, publicKey,
 		Content:   encryptedContent,
 	}
 
+	// Sign the event before computing checksum
 	event.Sign(privateKey)
+
+	// Compute checksum of the event before sending
+	checksum := computeEventChecksum(event)
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -190,5 +196,6 @@ func sendMessage(ctx context.Context, relay *nostr.Relay, privateKey, publicKey,
 		log.Printf("ACK sent successfully to %s...\n", recipientPubKey[:8])
 	} else {
 		log.Printf("Message sent successfully to %s...\n", recipientPubKey[:8])
+		log.Printf("Event checksum: %s\n", checksum)
 	}
 }
