@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/BoldBitcoinWallet/BBMTLib/tss"
@@ -119,6 +120,75 @@ func main() {
 			fmt.Printf("Go Error: %v\n", err)
 		} else {
 			fmt.Printf("\n [%s] Keysign Result %s\n", party, keysign)
+		}
+	}
+
+	if mode == "mpcsendbtc" {
+		// prepare args
+		server := os.Args[2]
+		session := os.Args[3]
+		party := os.Args[4]
+		parties := os.Args[5]
+		encKey := os.Args[6]
+		decKey := os.Args[7]
+		sessionKey := ""
+		keyshare := os.Args[8]
+		derivePath := os.Args[9]
+		receiverAddress := os.Args[10]
+		amountSatoshi := os.Args[11]
+		estimatedFee := os.Args[12]
+
+		// Decode base64 keyshare
+		decodedKeyshare, err := base64.StdEncoding.DecodeString(keyshare)
+		if err != nil {
+			fmt.Printf("Failed to decode base64 keyshare: %v\n", err)
+			return
+		}
+
+		// Get the public key and chain code from keyshare
+		var localState tss.LocalState
+		if err := json.Unmarshal(decodedKeyshare, &localState); err != nil {
+			fmt.Printf("Failed to parse keyshare: %v\n", err)
+			return
+		}
+
+		// Get the derived public key using chain code from keyshare
+		btcPub, err := tss.GetDerivedPubKey(localState.PubKey, localState.ChainCodeHex, derivePath, false)
+		if err != nil {
+			fmt.Printf("Failed to get derived public key: %v\n", err)
+			return
+		}
+
+		// Get the sender address
+		senderAddress, err := tss.ConvertPubKeyToBTCAddress(btcPub, "testnet3")
+		if err != nil {
+			fmt.Printf("Failed to get sender address: %v\n", err)
+			return
+		}
+
+		// Convert amount and fee from string to int64
+		amount, err := strconv.ParseInt(amountSatoshi, 10, 64)
+		if err != nil {
+			fmt.Printf("Failed to parse amount: %v\n", err)
+			return
+		}
+		fee, err := strconv.ParseInt(estimatedFee, 10, 64)
+		if err != nil {
+			fmt.Printf("Failed to parse fee: %v\n", err)
+			return
+		}
+
+		// Call MpcSendBTC
+		result, err := tss.MpcSendBTC(
+			server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath,
+			btcPub, senderAddress, receiverAddress, amount, fee,
+		)
+		time.Sleep(time.Second)
+
+		if err != nil {
+			fmt.Printf("Go Error: %v\n", err)
+		} else {
+			fmt.Printf("\n [%s] MPCSendBTC Result %s\n", party, result)
 		}
 	}
 }
