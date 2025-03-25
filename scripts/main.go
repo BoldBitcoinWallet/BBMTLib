@@ -44,7 +44,6 @@ func main() {
 
 	if mode == "keygen" {
 
-		// prepare args
 		server := os.Args[2]
 		session := os.Args[3]
 		chainCode := os.Args[4]
@@ -53,25 +52,53 @@ func main() {
 		encKey := os.Args[7]
 		decKey := os.Args[8]
 		sessionKey := ""
+		nostrPrivKey := os.Args[9]
+		nostrPubKey := os.Args[10]
 		ppmFile := party + ".json"
 		keyshareFile := party + ".ks"
 
-		//join keygen
-		keyshare, err := tss.JoinKeygen(ppmFile, party, parties, encKey, decKey, session, server, chainCode, sessionKey)
+		// Assign different Nostr keys based on which peer is running
+		var peerNostrPubKey, peerNostrPrivKey string
+		if party == "peer1" {
+			peerNostrPubKey = nostrPubKey
+			peerNostrPrivKey = nostrPrivKey
+		} else if party == "peer2" {
+			peerNostrPubKey = os.Args[11]
+			peerNostrPrivKey = os.Args[12]
+		} else {
+			fmt.Printf("Invalid party: %s\n", party)
+			return
+		}
+
+		keyshare, err := tss.JoinKeygen(ppmFile, party, parties, encKey, decKey, session, server, chainCode, sessionKey, peerNostrPubKey, peerNostrPrivKey)
 		if err != nil {
 			fmt.Printf("Go Error: %v\n", err)
 		} else {
 
-			// save keyshare file - base64 encoded
-			fmt.Printf(party + " Keygen Result Saved")
-			encodedResult := base64.StdEncoding.EncodeToString([]byte(keyshare))
-			if err := os.WriteFile(keyshareFile, []byte(encodedResult), 0644); err != nil {
-				fmt.Printf("Failed to save keyshare for Peer1: %v\n", err)
-			}
-
 			var kgR tss.KeygenResponse
 			if err := json.Unmarshal([]byte(keyshare), &kgR); err != nil {
 				fmt.Printf("Failed to parse keyshare for %s: %v\n", party, err)
+			}
+
+			// Create LocalState with Nostr keys
+			var localState tss.LocalState
+			if err := json.Unmarshal([]byte(keyshare), &localState); err != nil {
+				fmt.Printf("Failed to parse keyshare for %s: %v\n", party, err)
+			}
+			localState.NostrPubKey = peerNostrPubKey
+			localState.NostrPrivKey = peerNostrPrivKey
+
+			// Marshal the updated LocalState
+			updatedKeyshare, err := json.Marshal(localState)
+			if err != nil {
+				fmt.Printf("Failed to marshal updated keyshare for %s: %v\n", party, err)
+			}
+
+			// save keyshare file - base64 encoded
+			fmt.Printf(party + " Keygen Result Saved")
+			encodedResult := base64.StdEncoding.EncodeToString(updatedKeyshare)
+			if err := os.WriteFile(keyshareFile, []byte(encodedResult), 0644); err != nil {
+				fmt.Printf("Failed to save keyshare for %s: %v\n", party, err)
 			}
 
 			// print out pubkeys and p2pkh address
@@ -88,6 +115,9 @@ func main() {
 					fmt.Printf("Failed to generate btc address for %s: %v\n", party, err)
 				} else {
 					fmt.Printf(party+" address btcP2Pkh: %s\n", btcP2Pkh)
+					fmt.Printf(party+" NOSTR PUBLIC KEY: %s\n", peerNostrPubKey)
+					fmt.Printf(party+" NOSTR PRIVATE KEY: %s\n", peerNostrPrivKey)
+					fmt.Println("--------------------------------")
 				}
 			}
 		}
@@ -95,7 +125,6 @@ func main() {
 
 	if mode == "keysign" {
 
-		// prepare args
 		server := os.Args[2]
 		session := os.Args[3]
 		party := os.Args[4]
@@ -112,7 +141,22 @@ func main() {
 		messageHashBytes := []byte(messageHash)
 		messageHashBase64 := base64.StdEncoding.EncodeToString(messageHashBytes)
 
-		// join keysign
+		decodedKeyshare, err := base64.StdEncoding.DecodeString(keyshare)
+		if err != nil {
+			fmt.Printf("Failed to decode base64 keyshare: %v\n", err)
+			return
+		}
+
+		// Get the public key and chain code from keyshare
+		var localState tss.LocalState
+		if err := json.Unmarshal(decodedKeyshare, &localState); err != nil {
+			fmt.Printf("Failed to parse keyshare: %v\n", err)
+			return
+		}
+
+		fmt.Printf(party+" NOSTR PUBLIC KEY: %+v\n", localState.NostrPubKey)
+		fmt.Printf(party+" NOSTR PRIVATE KEY: %+v\n", localState.NostrPrivKey)
+
 		keysign, err := tss.JoinKeysign(server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath, messageHashBase64)
 		time.Sleep(time.Second)
 
@@ -124,7 +168,6 @@ func main() {
 	}
 
 	if mode == "mpcsendbtc" {
-		// prepare args
 		server := os.Args[2]
 		session := os.Args[3]
 		party := os.Args[4]
@@ -137,6 +180,9 @@ func main() {
 		receiverAddress := os.Args[10]
 		amountSatoshi := os.Args[11]
 		estimatedFee := os.Args[12]
+		//nostrPubKey := os.Args[13]
+		//nostrPrivKey := os.Args[14]
+		//peerNostrPubKey := os.Args[15]
 
 		// Decode base64 keyshare
 		decodedKeyshare, err := base64.StdEncoding.DecodeString(keyshare)
@@ -166,7 +212,6 @@ func main() {
 			return
 		}
 
-		// Convert amount and fee from string to int64
 		amount, err := strconv.ParseInt(amountSatoshi, 10, 64)
 		if err != nil {
 			fmt.Printf("Failed to parse amount: %v\n", err)
@@ -178,7 +223,6 @@ func main() {
 			return
 		}
 
-		// Call MpcSendBTC
 		result, err := tss.MpcSendBTC(
 			server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath,
 			btcPub, senderAddress, receiverAddress, amount, fee,

@@ -16,12 +16,18 @@ go build -o "$BUILD_DIR/$BIN_NAME" main.go
 # Generate key pairs
 KEYPAIR1=$("$BUILD_DIR/$BIN_NAME" keypair)
 KEYPAIR2=$("$BUILD_DIR/$BIN_NAME" keypair)
+NOSTR_KEYPAIR1=$("$BUILD_DIR/$BIN_NAME" keypair)
+NOSTR_KEYPAIR2=$("$BUILD_DIR/$BIN_NAME" keypair)
 
 PRIVATE_KEY1=$(echo "$KEYPAIR1" | jq -r '.privateKey')
 PRIVATE_KEY2=$(echo "$KEYPAIR2" | jq -r '.privateKey')
+NOSTR_PRIVATE_KEY1=$(echo "$NOSTR_KEYPAIR1" | jq -r '.privateKey')
+NOSTR_PRIVATE_KEY2=$(echo "$NOSTR_KEYPAIR2" | jq -r '.privateKey')
 
 PUBLIC_KEY1=$(echo "$KEYPAIR1" | jq -r '.publicKey')
 PUBLIC_KEY2=$(echo "$KEYPAIR2" | jq -r '.publicKey')
+NOSTR_PUBLIC_KEY1=$(echo "$NOSTR_KEYPAIR1" | jq -r '.publicKey')
+NOSTR_PUBLIC_KEY2=$(echo "$NOSTR_KEYPAIR2" | jq -r '.publicKey')
 
 # Generate random session ID and chain code
 SESSION_ID=$("$BUILD_DIR/$BIN_NAME" random)
@@ -50,6 +56,15 @@ echo "PRIVATE_KEY2: $PRIVATE_KEY2"
 echo "PUBLIC_KEY1: $PUBLIC_KEY1"
 echo "PUBLIC_KEY2: $PUBLIC_KEY2"
 
+echo "NOSTR_KEYPAIR1: $NOSTR_KEYPAIR1"
+echo "NOSTR_KEYPAIR2: $NOSTR_KEYPAIR2"
+
+echo "NOSTR_PRIVATE_KEY1: $NOSTR_PRIVATE_KEY1"
+echo "NOSTR_PRIVATE_KEY2: $NOSTR_PRIVATE_KEY2"
+
+echo "NOSTR_PUBLIC_KEY1: $NOSTR_PUBLIC_KEY1"
+echo "NOSTR_PUBLIC_KEY2: $NOSTR_PUBLIC_KEY2"
+
 echo "SESSION ID: $SESSION_ID"
 echo "CHAIN CODE: $CHAIN_CODE"
 
@@ -60,11 +75,11 @@ PID0=$!
 
 # Start Keygen for both parties
 echo "Starting Keygen for PARTY1..."
-"$BUILD_DIR/$BIN_NAME" keygen "$SERVER" "$SESSION_ID" "$CHAIN_CODE" "$PARTY1" "$PARTIES" "$PUBLIC_KEY2" "$PRIVATE_KEY1" &
+"$BUILD_DIR/$BIN_NAME" keygen "$SERVER" "$SESSION_ID" "$CHAIN_CODE" "$PARTY1" "$PARTIES" "$PUBLIC_KEY2" "$PRIVATE_KEY1" "$NOSTR_PUBLIC_KEY1" "$NOSTR_PRIVATE_KEY1" "$NOSTR_PUBLIC_KEY2" "$NOSTR_PRIVATE_KEY2" &
 PID1=$!
 
 echo "Starting Keygen for PARTY2..."
-"$BUILD_DIR/$BIN_NAME" keygen "$SERVER" "$SESSION_ID" "$CHAIN_CODE" "$PARTY2" "$PARTIES" "$PUBLIC_KEY1" "$PRIVATE_KEY2" &
+"$BUILD_DIR/$BIN_NAME" keygen "$SERVER" "$SESSION_ID" "$CHAIN_CODE" "$PARTY2" "$PARTIES" "$PUBLIC_KEY1" "$PRIVATE_KEY2" "$NOSTR_PUBLIC_KEY1" "$NOSTR_PRIVATE_KEY1" "$NOSTR_PUBLIC_KEY2" "$NOSTR_PRIVATE_KEY2" &
 PID2=$!
 
 # Handle cleanup on exit

@@ -160,7 +160,7 @@ func setStatus(session string, status Status) {
 	Hook(SessionState(session))
 }
 
-func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chaincode, sessionKey string) (string, error) {
+func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chaincode, sessionKey, nostrPubKey, nostrPrivKey string) (string, error) {
 	parties := strings.Split(partiesCSV, ",")
 	if len(parties) != 2 {
 		return "", fmt.Errorf("only two parties")
@@ -481,7 +481,6 @@ func unpadPKCS7(data []byte) []byte {
 }
 
 func (m *MessengerImp) Send(from, to, body string) error {
-
 	m.Mutex.Lock()
 	defer m.Mutex.Unlock()
 
@@ -896,7 +895,6 @@ func downloadMessage(server, session, sessionKey, key string, tssServerImp Servi
 				// Delete applied message from the server
 				Logln("BBMTLog", "Deleting applied message:", message.Hash)
 				deleteMessage(server, session, key, message.Hash)
-
 			}
 			isApplyingMessages = false
 		}

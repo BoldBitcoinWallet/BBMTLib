@@ -14,23 +14,9 @@ import (
 	"github.com/nbd-wtf/go-nostr/nip04"
 )
 
-func main() {
-	// data := map[string]interface{}{
-	// 	"name": "new test",
-	// 	"data": "stuff",
-	// }
-
-	// jsonData, err := json.Marshal(data)
+// RunNostr starts the Nostr message listener and sender
+func RunNostr(senderPrivateKey, senderPublicKey string, peerPublicKeys []string) {
 	// Client 2's keys (valid pair)
-	myPrivateKey := "privKey goes here"
-	myPublicKey := "pubKey goes here"
-
-	// Client 1's public keys (for sending messages)
-	peerPublicKeys := []string{
-		"peer pubkeys go here",
-		"peer pubkeys go here",
-		"peer pubkeys go here",
-	}
 
 	for _, peerPubKey := range peerPublicKeys {
 		if !nostr.IsValidPublicKey(peerPubKey) {
@@ -39,12 +25,12 @@ func main() {
 		}
 	}
 
-	if err := validateKeys(myPrivateKey, myPublicKey); err != nil {
+	if err := validateKeys(senderPrivateKey, senderPublicKey); err != nil {
 		log.Printf("Key validation error: %v\n", err)
 		return
 	}
 
-	log.Printf("My Public Key: %s\n", myPublicKey)
+	log.Printf("My Public Key: %s\n", senderPublicKey)
 	fmt.Printf("Starting message listener and sending initial test message...")
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -57,10 +43,10 @@ func main() {
 	}
 	defer relay.Close()
 
-	go listenForMessages(ctx, relay, myPrivateKey, myPublicKey)
+	go listenForMessages(ctx, relay, senderPrivateKey, senderPublicKey)
 
 	for _, peerPubKey := range peerPublicKeys {
-		if peerPubKey != myPublicKey {
+		if peerPubKey != senderPublicKey {
 			//sendMessage(ctx, relay, myPrivateKey, myPublicKey, peerPubKey, string(jsonData))
 		}
 	}
