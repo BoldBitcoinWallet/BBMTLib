@@ -271,7 +271,7 @@ func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chain
 	return localState, nil
 }
 
-func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, keyshare, derivePath, message string) (string, error) {
+func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, keyshare, derivePath, message string, useNostr bool) (string, error) {
 	parties := strings.Split(partiesCSV, ",")
 	if len(parties) != 2 {
 		return "", fmt.Errorf("only two parties")
@@ -297,8 +297,26 @@ func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, k
 	status.Info = "start joinSession"
 	setStatus(session, status)
 
-	if err := joinSession(server, session, key); err != nil {
-		return "", fmt.Errorf("fail to register session: %w", err)
+	// Get the local state from keyshare
+	decodedKeyshare, err := base64.StdEncoding.DecodeString(keyshare)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode base64 keyshare: %w", err)
+	}
+
+	var localState LocalState
+	if err := json.Unmarshal(decodedKeyshare, &localState); err != nil {
+		return "", fmt.Errorf("failed to parse keyshare: %w", err)
+	}
+
+	// Use appropriate session joining function based on useNostr flag
+	if useNostr {
+		if err := NostrJoinSession(server, session, key); err != nil {
+			return "", fmt.Errorf("fail to register session: %w", err)
+		}
+	} else {
+		if err := joinSession(server, session, key); err != nil {
+			return "", fmt.Errorf("fail to register session: %w", err)
+		}
 	}
 
 	Logln("BBMTLog", "waiting parties...")
@@ -306,9 +324,17 @@ func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, k
 	status.Info = "waiting parties"
 	setStatus(session, status)
 
-	if err := awaitJoiners(parties, server, session); err != nil {
-		Logln("BBMTLog", "fail to wait all parties", "error", err)
-		return "", fmt.Errorf("fail to wait all parties: %w", err)
+	// Use appropriate await joiners function based on useNostr flag
+	if useNostr {
+		if err := NostrAwaitJoiners(parties, server, session); err != nil {
+			Logln("BBMTLog", "fail to wait all parties", "error", err)
+			return "", fmt.Errorf("fail to wait all parties: %w", err)
+		}
+	} else {
+		if err := awaitJoiners(parties, server, session); err != nil {
+			Logln("BBMTLog", "fail to wait all parties", "error", err)
+			return "", fmt.Errorf("fail to wait all parties: %w", err)
+		}
 	}
 
 	status.SeqNo++
@@ -316,10 +342,15 @@ func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, k
 	setStatus(session, status)
 
 	Logln("BBMTLog", "inbound messenger up...")
-	messenger := &MessengerImp{
-		Server:     server,
-		SessionID:  session,
-		SessionKey: sessionKey,
+	var messenger Messenger
+	if useNostr {
+		messenger = NewMessenger(server, session, sessionKey, useNostr, &localState)
+	} else {
+		messenger = &MessengerImp{
+			Server:     server,
+			SessionID:  session,
+			SessionKey: sessionKey,
+		}
 	}
 
 	localStateAccessor := &LocalStateAccessorImp{
@@ -339,7 +370,13 @@ func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, k
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	Logln("BBMTLog", "downloadMessage active...")
-	go downloadMessage(server, session, sessionKey, key, *tssServerImp, endCh, wg)
+
+	if useNostr {
+		go NostrDownloadMessage(server, session, sessionKey, key, *tssServerImp, endCh, wg)
+	} else {
+		go downloadMessage(server, session, sessionKey, key, *tssServerImp, endCh, wg)
+	}
+
 	Logln("BBMTLog", "start ECDSA keysign...")
 	resp, err := tssServerImp.KeysignECDSA(&KeysignRequest{
 		PubKey:               keyshare,
@@ -365,19 +402,34 @@ func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, k
 	setStatus(session, status)
 
 	time.Sleep(time.Second)
-	if err := endSession(server, session); err != nil {
-		close(endCh)
-		return "", fmt.Errorf("fail to end session: %w", err)
+
+	if useNostr {
+		if err := NostrEndSession(server, session); err != nil {
+			close(endCh)
+			return "", fmt.Errorf("fail to end session: %w", err)
+		}
+	} else {
+		if err := endSession(server, session); err != nil {
+			close(endCh)
+			return "", fmt.Errorf("fail to end session: %w", err)
+		}
 	}
+
 	status.Step++
 	status.Info = "session ended"
 	setStatus(session, status)
 
 	time.Sleep(time.Second)
-	err = flagPartyKeysignComplete(server, session, message, string(sigStr))
+
+	if useNostr {
+		err = NostrFlagPartyComplete(server, session, message)
+	} else {
+		err = flagPartyKeysignComplete(server, session, message, string(sigStr))
+	}
 	if err != nil {
 		Logln("BBMTLog", "Warning: flagPartyKeysignComplete", "error", err)
 	}
+
 	status.Step++
 	status.Info = "local party complete"
 	status.Done = true

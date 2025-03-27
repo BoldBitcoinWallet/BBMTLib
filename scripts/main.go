@@ -88,6 +88,16 @@ func main() {
 			localState.NostrPubKey = peerNostrPubKey
 			localState.NostrPrivKey = peerNostrPrivKey
 
+			// Initialize peer nostr public keys map
+			localState.PeerNostrPubKeys = make(map[string]string)
+
+			// Store peer nostr public keys
+			if party == "peer1" {
+				localState.PeerNostrPubKeys["peer2"] = os.Args[11]
+			} else if party == "peer2" {
+				localState.PeerNostrPubKeys["peer1"] = nostrPubKey
+			}
+
 			// Marshal the updated LocalState
 			updatedKeyshare, err := json.Marshal(localState)
 			if err != nil {
@@ -135,6 +145,11 @@ func main() {
 		keyshare := os.Args[8]
 		derivePath := os.Args[9]
 		message := os.Args[10]
+		useNostr, err := strconv.ParseBool(os.Args[11])
+		if err != nil {
+			fmt.Printf("Failed to parse useNostr flag: %v\n", err)
+			return
+		}
 
 		// message hash, base64 encoded
 		messageHash, _ := tss.Sha256(message)
@@ -157,7 +172,13 @@ func main() {
 		fmt.Printf(party+" NOSTR PUBLIC KEY: %+v\n", localState.NostrPubKey)
 		fmt.Printf(party+" NOSTR PRIVATE KEY: %+v\n", localState.NostrPrivKey)
 
-		keysign, err := tss.JoinKeysign(server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath, messageHashBase64)
+		// Print all peer nostr public keys
+		fmt.Printf("\nPeer Nostr Public Keys for %s:\n", party)
+		for peerID, pubKey := range localState.PeerNostrPubKeys {
+			fmt.Printf("  %s: %s\n", peerID, pubKey)
+		}
+		fmt.Println()
+		keysign, err := tss.JoinKeysign(server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath, messageHashBase64, useNostr)
 		time.Sleep(time.Second)
 
 		if err != nil {
@@ -180,6 +201,11 @@ func main() {
 		receiverAddress := os.Args[10]
 		amountSatoshi := os.Args[11]
 		estimatedFee := os.Args[12]
+		useNostr, err := strconv.ParseBool(os.Args[13])
+		if err != nil {
+			fmt.Printf("Failed to parse useNostr flag: %v\n", err)
+			return
+		}
 		//nostrPubKey := os.Args[13]
 		//nostrPrivKey := os.Args[14]
 		//peerNostrPubKey := os.Args[15]
@@ -225,7 +251,7 @@ func main() {
 
 		result, err := tss.MpcSendBTC(
 			server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath,
-			btcPub, senderAddress, receiverAddress, amount, fee,
+			btcPub, senderAddress, receiverAddress, amount, fee, useNostr,
 		)
 		time.Sleep(time.Second)
 

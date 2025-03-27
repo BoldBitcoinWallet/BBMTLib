@@ -53,6 +53,8 @@ echo "PUBLIC_KEY2: $PUBLIC_KEY2"
 echo "SESSION ID: $SESSION_ID"
 echo "MESSAGE: $MESSAGE"
 
+USENOSTR="false"
+
 # load keyshares
 KEYSHARE1=$(cat "$PARTY1".ks)
 KEYSHARE2=$(cat "$PARTY2".ks)
@@ -63,12 +65,6 @@ if [ -z "$KEYSHARE1" ] || [ -z "$KEYSHARE2" ]; then
     echo "Run Keygen before..."
     exit 1
 fi
-
-# Extract Nostr keys from keyshares
-NOSTR_PUB1=$(echo "$KEYSHARE1" | base64 -d | jq -r '.nostr_pub_key')
-NOSTR_PUB2=$(echo "$KEYSHARE2" | base64 -d | jq -r '.nostr_pub_key')
-NOSTR_PRIV1=$(echo "$KEYSHARE1" | base64 -d | jq -r '.nostr_priv_key')
-NOSTR_PRIV2=$(echo "$KEYSHARE2" | base64 -d | jq -r '.nostr_priv_key')
 
 # Start Relay in the background and track its PID
 echo "Starting Relay..."
@@ -81,17 +77,17 @@ sleep 1
 
 # Start keysign for both parties
 echo "Starting keysign for PARTY1..."
-"$BUILD_DIR/$BIN_NAME" keysign "$SERVER" "$SESSION_ID" "$PARTY1" "$PARTIES" "$PUBLIC_KEY2" "$PRIVATE_KEY1" "$KEYSHARE1" "$DERIVATION_PATH" "$MESSAGE" &
+"$BUILD_DIR/$BIN_NAME" keysign "$SERVER" "$SESSION_ID" "$PARTY1" "$PARTIES" "$PUBLIC_KEY2" "$PRIVATE_KEY1" "$KEYSHARE1" "$DERIVATION_PATH" "$MESSAGE" "$USENOSTR" &
 PID1=$!
 
 echo "Starting keysign for PARTY2..."
-"$BUILD_DIR/$BIN_NAME" keysign "$SERVER" "$SESSION_ID" "$PARTY2" "$PARTIES" "$PUBLIC_KEY1" "$PRIVATE_KEY2" "$KEYSHARE2" "$DERIVATION_PATH" "$MESSAGE" &
+"$BUILD_DIR/$BIN_NAME" keysign "$SERVER" "$SESSION_ID" "$PARTY2" "$PARTIES" "$PUBLIC_KEY1" "$PRIVATE_KEY2" "$KEYSHARE2" "$DERIVATION_PATH" "$MESSAGE" "$USENOSTR" &
 PID2=$!
 
 # Handle cleanup on exit
 trap "echo 'Stopping processes...'; kill $PID0 $PID1 $PID2; exit" SIGINT SIGTERM
 
-echo "keysign processes running. Press Ctrl+C to stop."
+echo "Keysign processes running. Press Ctrl+C to stop."
 
 # Keep the script alive
 wait
