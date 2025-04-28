@@ -558,6 +558,10 @@ func (m *MessengerImp) Send(from, to, body, parties string) error {
 	Logln("BBMTLog", "sending message...")
 
 	if m.Net_Type == "nostr" {
+		// Create a new mutex for nostr operations to prevent deadlocks
+		// var nostrMutex sync.Mutex
+		// nostrMutex.Lock()
+		// defer nostrMutex.Unlock()
 
 		var protoMessage ProtoMessage
 		protoMessage.MessageType = "message"
@@ -584,19 +588,17 @@ func (m *MessengerImp) Send(from, to, body, parties string) error {
 			//Logf("sending message from %s to %s: %v", from, to, protoMessage)
 		}
 
-		//Logf("sending nostr message: %v", protoMessage)
-		//Logf("Current nostrSessions: %v", nostrSessionList)
-		nostrSend(m.SessionID, from, protoMessage, "", "", "")
-		// if !isMaster(parties, from) {
+		// Release the main mutex temporarily during nostrSend to prevent deadlocks
+		nostrSendMutex.Lock()
+		err = nostrSend(m.SessionID, from, protoMessage, "", "", "")
 
-		// 	//time.Sleep(3 * time.Second)
-		// 	//if not master, then pause a few seconds
-		// 	//nostrSend(m.SessionID, from, ProtoMessage, "handshake", "", "", "")
-		// 	//nostrHandshake(m.SessionID, from)
+		time.Sleep(time.Second * 1)
+		nostrSendMutex.Unlock()
+		if err != nil {
+			return fmt.Errorf("failed to send nostr message: %w", err)
+		}
 
-		// } else if isMaster(parties, from) {
-
-		// }
+		//time.Sleep(5 * time.Second)
 	} else if m.Net_Type != "nostr" {
 
 		// Prepare the HTTP request
@@ -827,7 +829,7 @@ func downloadMessage(server, session, sessionKey, key string, tssServerImp Servi
 
 	defer wg.Done()
 	isApplyingMessages := false
-	until := time.Now().Add(time.Duration(msgFetchTimeout) * time.Second)
+	until := time.Now().Add(time.Duration(msgFetchTimeout) * time.Second * 3)
 	msgMap := make(map[string]bool)
 
 	for {
@@ -908,9 +910,25 @@ func downloadMessage(server, session, sessionKey, key string, tssServerImp Servi
 			if type_net == "nostr" {
 				if key == "peer1" {
 					//Logf("BBMTLog: nostrGetData: %v", nostrGetData(key))
+					fmt.Println("totalReceivedMessages", len(totalReceivedMessages))
+					fmt.Println("totalSentMessages", len(totalSentMessages))
+					//nostrsessions := nostrSessionList
+					//fmt.Println("nostrsessions", nostrsessions)
 				}
+				if key == "peer2" {
+
+					fmt.Println("totalReceivedMessages", len(totalReceivedMessages))
+					fmt.Println("totalSentMessages", len(totalSentMessages))
+					//nostrsessions := nostrSessionList
+					//fmt.Println("nostrsessions", nostrsessions)
+				}
+
 				//key = "message-" + session
+				nostrDownloadMutex.Lock()
+				//defer nostrMutex.Unlock()
 				msg, found := nostrGetData("message-" + session)
+				nostrDownloadMutex.Unlock()
+
 				if !found {
 					Logln("BBMTLog", "No message found for session:", session)
 					isApplyingMessages = false
