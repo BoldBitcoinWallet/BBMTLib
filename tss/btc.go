@@ -251,7 +251,7 @@ func MpcSendBTC(
 	/* tss */
 	server, key, partiesCSV, session, sessionKey, encKey, decKey, keyshare, derivePath,
 	/* btc */
-	publicKey, senderAddress, receiverAddress string, amountSatoshi, estimatedFee int64, net_type, newSession string) (string, error) {
+	publicKey, senderAddress, receiverAddress string, amountSatoshi, estimatedFee int64) (string, error) {
 
 	Logln("BBMTLog", "invoking MpcSendBTC...")
 
@@ -550,11 +550,6 @@ func MpcSendBTC(
 			return "", fmt.Errorf("script validation failed for input %d: %w", i, err)
 		}
 		Logf("Script validation succeeded for input %d", i)
-		nostrClearSessionCache(utxoSession)
-	}
-
-	if net_type == "nostr" {
-		nostrDeleteSession(session)
 	}
 
 	// Serialize and broadcast

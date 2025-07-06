@@ -265,6 +265,7 @@ func main() {
 	}
 
 	if mode == "keygen" {
+
 		// prepare args
 		server := os.Args[2]
 		session := os.Args[3]
@@ -339,24 +340,18 @@ func main() {
 		parties := os.Args[5]
 		encKey := os.Args[6]
 		decKey := os.Args[7]
+		sessionKey := ""
 		keyshare := os.Args[8]
 		derivePath := os.Args[9]
 		message := os.Args[10]
-
-		sessionKey := os.Args[11]
-		net_type := os.Args[12]
-
-		if len(sessionKey) > 0 {
-			encKey = ""
-			decKey = ""
-		}
 
 		// message hash, base64 encoded
 		messageHash, _ := tss.Sha256(message)
 		messageHashBytes := []byte(messageHash)
 		messageHashBase64 := base64.StdEncoding.EncodeToString(messageHashBytes)
 
-		keysign, err := tss.JoinKeysign(server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath, messageHashBase64, net_type)
+		// join keysign
+		keysign, err := tss.JoinKeysign(server, party, parties, session, sessionKey, encKey, decKey, keyshare, derivePath, messageHashBase64)
 		time.Sleep(time.Second)
 
 		if err != nil {

@@ -34,6 +34,10 @@ gomobile bind -v -target=android github.com/BoldBitcoinWallet/BBMTLib/tss
 "no usable NDK in /Android/Sdk: unsupported API version 16"
 # Then specify the version api with the following command
 gomobile bind -v -target=android -androidapi 21 github.com/BoldBitcoinWallet/BBMTLib/tss
+
+# Copy the generated tss.aar lib to the android/app/libs folder
+cp tss.aar ../android/app/libs/tss.aar
+```
 ```
 
 
