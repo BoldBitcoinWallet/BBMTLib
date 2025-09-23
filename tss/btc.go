@@ -38,7 +38,7 @@ func SetNetwork(network string) (string, error) {
 	if network == "mainnet" || network == "testnet3" {
 		_btc_net = network
 		if network == "mainnet" {
-			_api_url = "https://mempool.space/api"
+			_api_url = "https://primusbase.com:3006/api"
 		} else if network == "testnet3" {
 			_api_url = "https://mempool.space/testnet/api"
 		}
