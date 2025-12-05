@@ -1,10 +1,24 @@
 # OSX
 #
 .DS_Store
+
 *.aar
+
 *.jar
+
 Tss.xcframework/
+
 scripts/bin/
+
 scripts/*.json
+
 scripts/*.ks
+
 scripts/*.nostr
+
+# Test outputs
+test-*/
+nostr-keygen-output/
+nostr-keysign-output/
+*.log
+peer*.json
