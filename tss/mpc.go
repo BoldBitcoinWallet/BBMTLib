@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime/debug"
 	"sort"
 	"strconv"
 	"strings"
@@ -46,7 +47,7 @@ var (
 	encryptionKey    = ""
 	decryptionKey    = ""
 	localStateMemory = ""
-	keyGenTimeout    = 60
+	keyGenTimeout    = 120
 	keySignTimeout   = 60
 	msgFetchTimeout  = 70
 )
@@ -160,14 +161,23 @@ func setStatus(session string, status Status) {
 	Hook(SessionState(session))
 }
 
-func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chaincode, sessionKey string) (string, error) {
+func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chaincode, sessionKey string) (result string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg := fmt.Sprintf("PANIC in JoinKeygen: %v", r)
+			Logf("BBMTLog: %s", errMsg)
+			Logf("BBMTLog: Stack trace: %s", string(debug.Stack()))
+			err = fmt.Errorf("internal error (panic): %v", r)
+			result = ""
+		}
+	}()
+
 	parties := strings.Split(partiesCSV, ",")
-	if len(parties) != 2 {
-		return "", fmt.Errorf("only two parties")
-	}
+
 	if len(sessionKey) > 0 && (len(encKey) > 0 || len(decKey) > 0) {
 		return "", fmt.Errorf("either a session key, either enc/dec keys")
 	}
+
 	if len(sessionKey) == 0 && (len(encKey) == 0 || len(decKey) == 0) {
 		return "", fmt.Errorf("either a session key, either both enc/dec keys")
 	}
@@ -249,7 +259,7 @@ func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chain
 	time.Sleep(time.Second)
 	if err = endSession(server, session); err != nil {
 		close(endCh)
-		return "", fmt.Errorf("fail to end session: %w", err)
+		Logln("BBMTLog", "Warning: endSession", "error", err)
 	}
 	status.Step++
 	status.Info = "session ended"
@@ -271,15 +281,22 @@ func JoinKeygen(ppmPath, key, partiesCSV, encKey, decKey, session, server, chain
 	return localState, nil
 }
 
-func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, keyshare, derivePath, message string) (string, error) {
+func JoinKeysign(server, key, partiesCSV, session, sessionKey, encKey, decKey, keyshare, derivePath, message string) (result string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg := fmt.Sprintf("PANIC in JoinKeysign: %v", r)
+			Logf("BBMTLog: %s", errMsg)
+			Logf("BBMTLog: Stack trace: %s", string(debug.Stack()))
+			err = fmt.Errorf("internal error (panic): %v", r)
+			result = ""
+		}
+	}()
 	parties := strings.Split(partiesCSV, ",")
-	if len(parties) != 2 {
-		return "", fmt.Errorf("only two parties")
-	}
 
 	if len(sessionKey) > 0 && (len(encKey) > 0 || len(decKey) > 0) {
 		return "", fmt.Errorf("either a session key, either enc/dec keys")
 	}
+
 	if len(sessionKey) == 0 && (len(encKey) == 0 || len(decKey) == 0) {
 		return "", fmt.Errorf("either a session key, either both enc/dec keys")
 	}
@@ -408,7 +425,17 @@ func md5Hash(data string) (string, error) {
 	return hashHex, nil
 }
 
-func AesEncrypt(data, key string) (string, error) {
+func AesEncrypt(data, key string) (result string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg := fmt.Sprintf("PANIC in AesEncrypt: %v", r)
+			Logf("BBMTLog: %s", errMsg)
+			Logf("BBMTLog: Stack trace: %s", string(debug.Stack()))
+			err = fmt.Errorf("internal error (panic): %v", r)
+			result = ""
+		}
+	}()
+
 	decodedKey, err := hex.DecodeString(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode key: %w", err)
@@ -430,7 +457,17 @@ func AesEncrypt(data, key string) (string, error) {
 	return encodedData, nil
 }
 
-func AesDecrypt(encryptedData, key string) (string, error) {
+func AesDecrypt(encryptedData, key string) (result string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errMsg := fmt.Sprintf("PANIC in AesDecrypt: %v", r)
+			Logf("BBMTLog: %s", errMsg)
+			Logf("BBMTLog: Stack trace: %s", string(debug.Stack()))
+			err = fmt.Errorf("internal error (panic): %v", r)
+			result = ""
+		}
+	}()
+
 	// Decode the key from hex
 	decodedKey, err := hex.DecodeString(key)
 	if err != nil {
@@ -767,7 +804,7 @@ func downloadMessage(server, session, sessionKey, key string, tssServerImp Servi
 			Logln("BBMTLog", "Received signal to end downloadMessage. Stopping...")
 			return
 
-		case <-time.After(time.Second):
+		case <-time.After(time.Second / 2):
 			if time.Since(until) > 0 {
 				Logln("BBMTLog", "Received timeout to end downloadMessage. Stopping...")
 				return
