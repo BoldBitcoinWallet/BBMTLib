@@ -1,0 +1,49 @@
+=== Keysign Parameters ===
+Relays         : ws://localhost:7777
+Session ID     : 69b3da9df955fea6b28a6b286077ae0375bd3b7c47c0106fe96740643b1a5f25
+Session Key    : b6d281b7f3035cfde9585363437f1e405ac23e37acc7c821df7abdf3a19b06f8
+Message        : ec85c6c45c654fad968b01cd2545c0e7dbdc962df057eeb9776de4d6be5b0511
+Derivation Path: m/44'/0'/0'/0/0
+
+Party 1 npub: npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+Party 2 npub: npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r
+All Parties  : npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r
+Keysign With : npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r
+============================
+
+Starting Nostr keysign for both parties in parallel...
+Party 1 PID: 56843
+Party 2 PID: 56844
+Signatures: ./test-nostr-keysign-output/party1-signature.json and ./test-nostr-keysign-output/party2-signature.json
+Logs: ./test-nostr-keysign-output/party1.log and ./test-nostr-keysign-output/party2.log
+
+Waiting for keysign to complete...
+
+✓ Keysign completed successfully!
+Time elapsed: 0m 8s
+
+=== Party 1 Signature ===
+{
+  "msg": "XTWCaGlgsQ7W103kvtROYjMPMbIMFiN0ZGLTNJFQjRk=",
+  "msg_hex": "5d3582686960b10ed6d74de4bed44e62330f31b20c1623746462d33491508d19",
+  "r": "5ce2c5881189079207e724c76b8e18fa0cfc05e300bbc919c1ddd22c77c20ed0",
+  "s": "409a9b762c84ddc1091b967749ec2442508b95c2c8d0e5c410dafd681e9de4b9",
+  "der_signature": "304402205ce2c5881189079207e724c76b8e18fa0cfc05e300bbc919c1ddd22c77c20ed00220409a9b762c84ddc1091b967749ec2442508b95c2c8d0e5c410dafd681e9de4b9",
+  "recovery_id": "00"
+}
+
+=== Party 2 Signature ===
+{
+  "msg": "XTWCaGlgsQ7W103kvtROYjMPMbIMFiN0ZGLTNJFQjRk=",
+  "msg_hex": "5d3582686960b10ed6d74de4bed44e62330f31b20c1623746462d33491508d19",
+  "r": "5ce2c5881189079207e724c76b8e18fa0cfc05e300bbc919c1ddd22c77c20ed0",
+  "s": "409a9b762c84ddc1091b967749ec2442508b95c2c8d0e5c410dafd681e9de4b9",
+  "der_signature": "304402205ce2c5881189079207e724c76b8e18fa0cfc05e300bbc919c1ddd22c77c20ed00220409a9b762c84ddc1091b967749ec2442508b95c2c8d0e5c410dafd681e9de4b9",
+  "recovery_id": "00"
+}
+
+✓ Signatures match!
+
+Signatures saved to:
+  ./test-nostr-keysign-output/party1-signature.json
+  ./test-nostr-keysign-output/party2-signature.json

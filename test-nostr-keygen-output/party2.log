@@ -1,0 +1,362 @@
+BBMTLog: Successfully connected to relay ws://localhost:7777
+BBMTLog: Relay ws://localhost:7777 connected (1/1 total)
+BBMTLog: First relay connected, proceeding (other relays will continue connecting in background)
+BBMTLog: Publishing ready event for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130, npub npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r, expecting peers: [npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm]
+BBMTLog: Publishing ready wrap to peer npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130]], pubkey=7b9806f97f63c6c379b4...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Ready event published successfully to all peers with tag t=2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130
+BBMTLog: Successfully decoded npub npub1xe5qemm8hry25ecw20etxnaqk -> hex 36680cef67b8c8aa670e...
+BBMTLog: Converted npub npub1xe5qemm8hry25ec... -> hex 36680cef67b8c8aa670e...
+BBMTLog: AwaitPeers - SessionID: 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130, LocalNpub: npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r (hex: 307d1cdbd454307bb85cb99bfdf1bee9623aed69e3e7bc4f4b08d0336c1e100c), Expected peers (npub): [npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm]
+BBMTLog: Querying for existing ready wraps for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130 (from last 1 minute)
+BBMTLog: Query on relay ws://localhost:7777 returned 1 wrap events for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130
+BBMTLog: Found existing ready wrap from npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (hex: 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5)
+BBMTLog: Initial query completed, found 1 peers
+BBMTLog: Starting subscription for ready wraps for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130
+BBMTLog: Awaiting 1 peers for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130 (already seen: 1)
+BBMTLog: Client.Subscribe - WARNING: No relays connected after 5 seconds (all 1 relays may have failed)
+BBMTLog: Client.Subscribe - relay ws://localhost:7777 connected (1/1)
+BBMTLog: Received ready wrap from npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (hex: 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5)
+BBMTLog: All peers ready!
+2025/12/05 11:19:32 BBMTLog ppm generation...
+2025/12/05 11:19:32 BBMTLog ppm file not found...
+2025/12/05 11:19:32 BBMTLog ppm creation...
+2025/12/05 11:19:32 BBMTLog ppm GeneratePreParams...
+2025-12-05T11:19:32.788-0600	[34mINFO[0m	tss-lib	keygen/prepare.go:90	generating the safe primes for the signing proofs, please wait...
+2025-12-05T11:19:32.788-0600	[34mINFO[0m	tss-lib	keygen/prepare.go:75	generating the Paillier modulus, please wait...
+2025-12-05T11:19:38.763-0600	[34mINFO[0m	tss-lib	keygen/prepare.go:97	safe primes generated. took 5.97509773s
+
+2025-12-05T11:19:40.788-0600	[34mINFO[0m	tss-lib	keygen/prepare.go:111	still generating primes...
+2025-12-05T11:19:44.445-0600	[34mINFO[0m	tss-lib	keygen/prepare.go:83	paillier modulus generated. took 11.657282691s
+
+2025/12/05 11:19:44 BBMTLog ppm empty skip saving...
+BBMTLog: MessagePump subscribing to session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130, local npub npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r (hex: 307d1cdbd454307bb85cb99bfdf1bee9623aed69e3e7bc4f4b08d0336c1e100c), expecting authors (hex): [36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5]
+BBMTLog: MessagePump subscription active
+BBMTLog: Client.Subscribe - WARNING: No relays connected after 5 seconds (all 1 relays may have failed)
+2025-12-05T11:19:44.454-0600	[34mINFO[0m	tss-lib	tss/party.go:139	party {1,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r}: ecdsa-keygen round 1 starting
+BBMTLog: Client.Subscribe - relay ws://localhost:7777 connected (1/1)
+BBMTLog: MessagePump received event from 25a96c3b7c336941124706487b1610c97990b0896674ba495d70f783e3a9ffc0 (hex), kind=1059, content_len=1456, tags_count=2
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: Messenger sending message from npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (237956 bytes)
+BBMTLog: Messenger split into 15 chunks
+BBMTLog: Messenger publishing wrapped chunk 1/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/0/15]], pubkey=afd16abf8dbe62874174...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 1/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 2/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/1/15]], pubkey=9ec6ccbf382d4b52879a...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 2/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 3/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/2/15]], pubkey=f20a1c5f0f52b0b76b7c...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 3/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 4/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/3/15]], pubkey=813cee55591f10ab421d...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 4/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 5/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/4/15]], pubkey=15d3048479e9b24f5011...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 5/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 6/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/5/15]], pubkey=1f95ed3f34db2396b6c0...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 6/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 7/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/6/15]], pubkey=06cb52d360fabb67da84...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 7/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 8/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/7/15]], pubkey=5be86bc2a509486a4d2c...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 8/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 9/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/8/15]], pubkey=16b308115aa53ea00269...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 9/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 10/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/9/15]], pubkey=d9a63f1d6d8d159babfe...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 10/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 11/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/10/15]], pubkey=9269dc462f3b433f7b4b...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 11/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 12/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/11/15]], pubkey=6a010f303146e6ac6a59...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 12/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 13/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/12/15]], pubkey=1245dec37e5d6eaf8d36...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 13/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 14/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/13/15]], pubkey=e5c21c87215fa5bd64b7...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 14/15 successfully
+BBMTLog: Messenger publishing wrapped chunk 15/15 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bcdc9e3d733ca3350201dbe52d8d59068286ceeedc46dca06c9a1ef40facfb0f/14/15]], pubkey=8d19cc0a2184e3922e45...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 15/15 successfully
+BBMTLog: MessagePump received event from 439e3faa68a5858dc8574d1ce7506e4a9d47960f0ec92fae2a14f174e89c3ec1 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=0/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 1/15 to assembler
+BBMTLog: MessagePump chunk 1/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from fc610c43699a840b628bf3fec35eb6203783a11380805deb0042b16baf6a87de (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=1/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 2/15 to assembler
+BBMTLog: MessagePump chunk 2/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 195ac2a27691aa056a244680000c67e7b11542b96089d3e689400cd99f853c06 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=2/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 3/15 to assembler
+BBMTLog: MessagePump chunk 3/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from f7c56c2903191e135b9af129847a588f211d0fe45dff2e1f2b53090201e82219 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=3/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 4/15 to assembler
+BBMTLog: MessagePump chunk 4/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 5c2194897ffd8fed72346d81a34098d82bf06bf1e74e3b0f06c8baf61c1d911c (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=4/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 5/15 to assembler
+BBMTLog: MessagePump chunk 5/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 2dc2a8f9e911bfca6bfca8673b79292b0a01f3eb9bf88de9cd87a14fabc4530b (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=5/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 6/15 to assembler
+BBMTLog: MessagePump chunk 6/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from c9cad8201dc60cd5e8062ea72dfac466251c54f25809e8fa28946808e479ad9a (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=6/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 7/15 to assembler
+BBMTLog: MessagePump chunk 7/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 36d285023e190ae0978a4b50f025be9d16f32bcfb6832d3b56639bddeb771b78 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=7/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 8/15 to assembler
+BBMTLog: MessagePump chunk 8/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 1515d6f784f098928fe2c279b50ddbbfd6bac8bddca8da3bf735cd877d6a6aa5 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=8/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 9/15 to assembler
+BBMTLog: MessagePump chunk 9/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from b521d75b095b2a7ea9f945dfe402e7a86253c7a64673417a9115c55e30aa5f7c (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=9/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 10/15 to assembler
+BBMTLog: MessagePump chunk 10/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 74659a5b10efafce1cb236edc9ef994b368caad185d19703191a079310b8296d (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=10/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 11/15 to assembler
+BBMTLog: MessagePump chunk 11/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 81384241e35e1147e7053bb2bbb371ba600a435fb0706a2b5da04a5b9d1e5d48 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=11/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 12/15 to assembler
+BBMTLog: MessagePump chunk 12/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 82c8a2a0e6178a706e1955ff30ada60f0e584401afa19863e9ce28fa4018da5d (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=12/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 13/15 to assembler
+BBMTLog: MessagePump chunk 13/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 8584be931aeab81a727df306a8e55a0d5848c023ef57b12263ace299c4c1e265 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=13/15
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 14/15 to assembler
+BBMTLog: MessagePump chunk 14/15 added, waiting for more chunks
+BBMTLog: MessagePump received event from 8ba74832e527513b2c04cb875093c1ccb068556c079af617acdbec998edb458d (hex), kind=1059, content_len=27396, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=69ec8ba039ba270fddf626ca2767a0cdbe54952f5244aa83ab7fc8d2dfa0aab4, index=14/15
+BBMTLog: MessagePump decoded chunk data: 8576 bytes
+BBMTLog: MessagePump adding chunk 15/15 to assembler
+BBMTLog: MessagePump all chunks received, reassembled 237952 bytes
+BBMTLog: MessagePump calling handler with 237952 bytes
+BBMTLog: MessagePump handler completed successfully
+BBMTLog: MessagePump received event from b81c679deab90afd4f31fd20c944327dec09e112d7e6a1f5d71a2923889f4a0d (hex), kind=1059, content_len=19204, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=74cd72257feac525c930acef8a018af82cd261ccb889aef0c7ce24b229da546f, index=0/1
+BBMTLog: MessagePump decoded chunk data: 6796 bytes
+BBMTLog: MessagePump adding chunk 1/1 to assembler
+BBMTLog: MessagePump all chunks received, reassembled 6796 bytes
+BBMTLog: MessagePump calling handler with 6796 bytes
+BBMTLog: MessagePump handler completed successfully
+BBMTLog: Messenger sending message from npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (6796 bytes)
+BBMTLog: Messenger split into 1 chunks
+BBMTLog: Messenger publishing wrapped chunk 1/1 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk 0424efa1422732d3700a9f1aa7dbb23b93cc13be06962ee9512b18da1e0e591c/0/1]], pubkey=ac6e323ecd56bfd882cf...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 1/1 successfully
+BBMTLog: MessagePump received event from 8b5aa916badc41c390c9d451d41737e7f54a435bb297425ff1c97b7fd6bf73f4 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=94b2f7b45701775de971dd8c6f0f5ca47f5f9c2f35fda47447f55ad990c38aaf, index=0/5
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 1/5 to assembler
+BBMTLog: MessagePump chunk 1/5 added, waiting for more chunks
+BBMTLog: MessagePump received event from 4b84c1a238231504f87781a8f284be8fc12759f61786b4fe12c21d7011b2c650 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=94b2f7b45701775de971dd8c6f0f5ca47f5f9c2f35fda47447f55ad990c38aaf, index=1/5
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 2/5 to assembler
+BBMTLog: MessagePump chunk 2/5 added, waiting for more chunks
+BBMTLog: MessagePump received event from c09da1681cdc5318df9076fe42600ee2992da759493518c66db05e2d046140c6 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=94b2f7b45701775de971dd8c6f0f5ca47f5f9c2f35fda47447f55ad990c38aaf, index=2/5
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 3/5 to assembler
+BBMTLog: MessagePump chunk 3/5 added, waiting for more chunks
+BBMTLog: MessagePump received event from 8d7111f8a71ebc79c4738a57b7df39ffca4475ac3103af59ffb4428beb962517 (hex), kind=1059, content_len=54704, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=94b2f7b45701775de971dd8c6f0f5ca47f5f9c2f35fda47447f55ad990c38aaf, index=3/5
+BBMTLog: MessagePump decoded chunk data: 16384 bytes
+BBMTLog: MessagePump adding chunk 4/5 to assembler
+BBMTLog: MessagePump chunk 4/5 added, waiting for more chunks
+BBMTLog: MessagePump received event from 11f894ac218453779820cb3bf470abe792175b3f85d1f8344ba507c105693ff7 (hex), kind=1059, content_len=27396, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=94b2f7b45701775de971dd8c6f0f5ca47f5f9c2f35fda47447f55ad990c38aaf, index=4/5
+BBMTLog: MessagePump decoded chunk data: 9248 bytes
+BBMTLog: MessagePump adding chunk 5/5 to assembler
+BBMTLog: MessagePump all chunks received, reassembled 74784 bytes
+BBMTLog: MessagePump calling handler with 74784 bytes
+BBMTLog: MessagePump handler completed successfully
+2025-12-05T11:19:53.144-0600	[34mINFO[0m	tss-lib	tss/party.go:176	party {1,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r}: ecdsa-keygen round 2 started
+BBMTLog: Messenger sending message from npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (74784 bytes)
+BBMTLog: Messenger split into 5 chunks
+BBMTLog: Messenger publishing wrapped chunk 1/5 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk a26f165ee3f3b10db39351de4d890768e63d1d09251920c0d3af9ac058694ebc/0/5]], pubkey=1f3c9ae216fa4147ece4...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 1/5 successfully
+BBMTLog: Messenger publishing wrapped chunk 2/5 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk a26f165ee3f3b10db39351de4d890768e63d1d09251920c0d3af9ac058694ebc/1/5]], pubkey=31589abb72f67f857631...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 2/5 successfully
+BBMTLog: Messenger publishing wrapped chunk 3/5 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk a26f165ee3f3b10db39351de4d890768e63d1d09251920c0d3af9ac058694ebc/2/5]], pubkey=368d16b2ffcae391c941...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 3/5 successfully
+BBMTLog: Messenger publishing wrapped chunk 4/5 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk a26f165ee3f3b10db39351de4d890768e63d1d09251920c0d3af9ac058694ebc/3/5]], pubkey=3db38f766528ab4c21b2...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 4/5 successfully
+BBMTLog: Messenger publishing wrapped chunk 5/5 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk a26f165ee3f3b10db39351de4d890768e63d1d09251920c0d3af9ac058694ebc/4/5]], pubkey=e3f8ba0b1a7cd6800705...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 5/5 successfully
+2025-12-05T11:19:53.371-0600	[34mINFO[0m	tss-lib	tss/party.go:176	party {1,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r}: ecdsa-keygen round 3 started
+BBMTLog: Messenger sending message from npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm (6288 bytes)
+BBMTLog: Messenger split into 1 chunks
+BBMTLog: Messenger publishing wrapped chunk 1/1 to npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130] [chunk bca0952fa2ef5ed92e50a52e57900c3714d0909a7b73d2e2e12891005964e1a5/0/1]], pubkey=a6c01df1e18c792ea5f7...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Messenger published wrapped chunk 1/1 successfully
+BBMTLog: MessagePump received event from 3e39fad07d704e6e81911ac6c5aea888deb91968a8d3b2f6c8cce367fc174540 (hex), kind=1059, content_len=19204, tags_count=3
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: MessagePump parsed chunk metadata: hash=33d4a7a90dbf0f13cc369659c15f7e1d9611d6c0f842ea0f408193319ea93263, index=0/1
+BBMTLog: MessagePump decoded chunk data: 6288 bytes
+BBMTLog: MessagePump adding chunk 1/1 to assembler
+BBMTLog: MessagePump all chunks received, reassembled 6288 bytes
+BBMTLog: MessagePump calling handler with 6288 bytes
+BBMTLog: MessagePump handler completed successfully
+2025-12-05T11:19:53.808-0600	[34mINFO[0m	tss-lib	tss/party.go:176	party {1,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r}: ecdsa-keygen round 4 started
+2025-12-05T11:19:53.808-0600	[34mINFO[0m	tss-lib	tss/party.go:179	party {1,npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r}: ecdsa-keygen finished!
+2025/12/05 11:19:53 BBMTLog pubKey done, finalizing...
+2025/12/05 11:19:54 BBMTLog keyshare generated:  npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r
+BBMTLog: MessagePump received event from a46ebc64e0b69c7440bf921f4f3d5ecf9d7f8e6cf006fdb5be3a49e300c49f35 (hex), kind=1059, content_len=1456, tags_count=2
+BBMTLog: MessagePump unwrapped gift, got seal from 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5
+BBMTLog: MessagePump unsealed, got rumor
+BBMTLog: Publishing complete event for session 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130, phase keygen, npub npub1xp73ek752sc8hwzuhxdlmud7a93r4mtfu0nmcn6tprgrxmq7zqxqccve8r, expecting peers: [npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm]
+BBMTLog: Publishing complete wrap (phase=keygen) to peer npub1xe5qemm8hry25ecw20etxnaqkp85cmzuah2336kt7z558r074h6sw557cm
+BBMTLog: Client.PublishWrap - event kind=1059, tags=[[p 36680cef67b8c8aa670e53f2b34fa0b04f4c6c5cedd518eacbf0a9438dfeadf5] [t 2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130]], pubkey=92f0eaa0589b2d4586c8...
+BBMTLog: Client.PublishWrap - relay ws://localhost:7777 success (1/1 succeeded)
+BBMTLog: Client.PublishWrap - first relay succeeded, returning immediately (other relays continue in background)
+BBMTLog: Client.PublishWrap - all 1 relays succeeded
+BBMTLog: Complete event (phase=keygen) published successfully to all peers with tag t=2fe7759276e473a6726a016a48dff5e1f0d20c307477cd647db1cf7be78d8130
+Keyshare saved to ./test-nostr-keygen-output/party2-keyshare.json
