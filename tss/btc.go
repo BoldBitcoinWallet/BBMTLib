@@ -2,6 +2,7 @@ package tss
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -9,15 +10,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"runtime/debug"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcd/peer"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	mecdsa "github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa"
@@ -38,6 +42,26 @@ var _api_urls = []string{"https://mempool.space/api", "https://benpool.space/api
 
 var _fee_set = "30m"
 
+// Electrs/ElectrumX server support for address-based queries
+var (
+	_electrs_url = "" // Electrs HTTP REST API URL (e.g., "http://localhost:3000")
+	_use_electrs = false
+)
+
+// P2P network connection variables
+var (
+	_p2p_peers       []*peer.Peer
+	_p2p_peers_mu    sync.RWMutex
+	_use_p2p         = false
+	_p2p_ctx         context.Context
+	_p2p_cancel      context.CancelFunc
+	_p2p_chain_cfg   *chaincfg.Params
+	_p2p_tx_cache    = make(map[string]*wire.MsgTx)
+	_p2p_cache_mu    sync.RWMutex
+	_p2p_pending_txs = make(map[string]chan *wire.MsgTx) // txid -> channel
+	_p2p_pending_mu  sync.RWMutex
+)
+
 func UseFeeAPIs(urls string) (string, error) {
 	_api_urls = strings.Split(urls, ",")
 	return urls, nil
@@ -55,6 +79,28 @@ func SetNetwork(network string) (string, error) {
 		return _api_url, nil
 	}
 	return "", fmt.Errorf("non supported network %s", network)
+}
+
+// SetNetworkWithAutoElectrs sets the network and attempts to auto-discover an Electrum server
+// Falls back to API mode if no Electrum server is found
+func SetNetworkWithAutoElectrs(network string) (string, error) {
+	// Set network first
+	_, err := SetNetwork(network)
+	if err != nil {
+		return "", err
+	}
+
+	// Try to auto-discover Electrum server
+	result, err := AutoDiscoverElectrs(network)
+	if err != nil {
+		Logf("Electrum auto-discovery failed: %v", err)
+		Logf("Falling back to API mode (mempool.space)")
+		_use_electrs = false
+		return _api_url, nil
+	}
+
+	Logf("Auto-discovered Electrum server: %s", result)
+	return result, nil
 }
 
 func UseAPI(network, base string) (string, error) {
@@ -75,11 +121,331 @@ func UseFeePolicy(feeType string) (string, error) {
 }
 
 func GetNetwork() (string, error) {
+	if _use_p2p {
+		return _btc_net + "@p2p", nil
+	}
+	if _use_electrs {
+		return _btc_net + "@electrs://" + _electrs_url, nil
+	}
 	return _btc_net + "@" + _api_url, nil
+}
+
+// UseElectrsServer configures the library to use an Electrs server for address-based queries
+// Electrs is a Bitcoin indexer that supports address-based UTXO queries via HTTP REST API
+// url: Electrs server URL (e.g., "http://localhost:3000" or "https://electrs.example.com")
+// Public Electrs servers are available, but you can also run your own
+func UseElectrsServer(url string) (string, error) {
+	_electrs_url = strings.TrimSuffix(url, "/")
+	_use_electrs = true
+
+	Logf("Electrs server configured: %s", _electrs_url)
+	return fmt.Sprintf("Electrs server configured: %s", _electrs_url), nil
+}
+
+// testElectrsServer tests if an Electrs server is working
+func testElectrsServer(serverURL string, network string) bool {
+	// Use a well-known address for testing
+	testAddr := "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+	if network == "mainnet" {
+		testAddr = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" // Genesis block address
+	}
+
+	// Try Electrs REST API format: /addrs/:address/utxo
+	url := fmt.Sprintf("%s/addrs/%s/utxo", serverURL, testAddr)
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	// Server is working if it returns 200 (found) or 404 (not found but server responded)
+	return resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotFound
+}
+
+// AutoDiscoverElectrs attempts to automatically find a working public Electrum/Electrs server
+// Tries multiple known public servers and returns the first working one
+func AutoDiscoverElectrs(network string) (string, error) {
+	Logf("Attempting to auto-discover public Electrum server for %s...", network)
+
+	// Comprehensive list of known public Electrum/Electrs servers
+	// These are community-maintained servers that support HTTP REST API
+	var servers []string
+	if network == "mainnet" {
+		servers = []string{
+			// Blockstream (most reliable)
+			"https://electrum.blockstream.info",
+			// Other public servers (may vary in availability)
+			"https://electrum.bitaroo.net",
+			"https://electrumx.ultracloud.tk",
+			"https://electrum.hsmiths.com",
+			"https://electrum3.voipconsulting.nl",
+			"https://electrumx.erbium.eu",
+			"https://electrumx.taborsky.cz",
+			"https://electrumx.bitcoin.sk",
+			"https://electrumx.btcprivate.org",
+			"https://electrumx.kmd.sh",
+		}
+	} else {
+		servers = []string{
+			// Blockstream testnet
+			"https://electrum.blockstream.info/testnet",
+			// Other testnet servers
+			"https://testnet.qtornado.com",
+			"https://testnet.hsmiths.com",
+		}
+	}
+
+	// Try each server in parallel for faster discovery
+	type serverResult struct {
+		url   string
+		works bool
+		err   error
+	}
+	resultChan := make(chan serverResult, len(servers))
+
+	// Test all servers concurrently
+	for _, server := range servers {
+		go func(srv string) {
+			works := testElectrsServer(srv, network)
+			resultChan <- serverResult{url: srv, works: works}
+		}(server)
+	}
+
+	// Collect results with timeout
+	timeout := time.After(10 * time.Second)
+	workingServers := []string{}
+
+	for i := 0; i < len(servers); i++ {
+		select {
+		case result := <-resultChan:
+			if result.works {
+				workingServers = append(workingServers, result.url)
+				Logf("✓ Found working server: %s", result.url)
+			}
+		case <-timeout:
+			// Continue with servers that have already responded
+			break
+		}
+	}
+
+	// Use the first working server found
+	if len(workingServers) > 0 {
+		// Prefer Blockstream if available (most reliable)
+		preferred := workingServers[0]
+		for _, srv := range workingServers {
+			if strings.Contains(srv, "blockstream.info") {
+				preferred = srv
+				break
+			}
+		}
+
+		result, err := UseElectrsServer(preferred)
+		if err == nil {
+			Logf("✓ Using Electrum server: %s", preferred)
+			return result, nil
+		}
+	}
+
+	return "", fmt.Errorf(`no working Electrum server found. Options:
+1. Try again later (servers may be temporarily unavailable)
+2. Configure manually: UseElectrsServer("https://electrum.blockstream.info")
+3. Run your own Electrs server for better reliability`)
+}
+
+// ConnectToBitcoinNetwork connects directly to the Bitcoin P2P network
+// This allows querying transactions directly from network peers without a local node
+func ConnectToBitcoinNetwork(network string) (string, error) {
+	_p2p_peers_mu.Lock()
+	defer _p2p_peers_mu.Unlock()
+
+	// Set network parameters
+	var params *chaincfg.Params
+	if network == "mainnet" {
+		params = &chaincfg.MainNetParams
+	} else {
+		params = &chaincfg.TestNet3Params
+	}
+	_p2p_chain_cfg = params
+	_btc_net = network
+
+	// Disconnect existing connections
+	if _p2p_cancel != nil {
+		_p2p_cancel()
+	}
+	for _, p := range _p2p_peers {
+		if p != nil {
+			p.Disconnect()
+		}
+	}
+	_p2p_peers = nil
+
+	// Create context for P2P connections
+	_p2p_ctx, _p2p_cancel = context.WithCancel(context.Background())
+
+	// Get DNS seeds for peer discovery
+	var seeds []string
+	if network == "mainnet" {
+		seeds = []string{
+			"seed.bitcoin.sipa.be",
+			"dnsseed.bluematt.me",
+			"dnsseed.bitcoin.dashjr.org",
+			"seed.bitcoinstats.com",
+		}
+	} else {
+		seeds = []string{
+			"testnet-seed.bitcoin.jonasschnelli.ch",
+			"seed.tbtc.petertodd.org",
+			"testnet-seed.bluematt.me",
+		}
+	}
+
+	// Resolve DNS seeds to get peer addresses
+	var peerAddrs []net.Addr
+	for _, seed := range seeds {
+		addrs, err := net.LookupHost(seed)
+		if err != nil {
+			continue
+		}
+		for _, addr := range addrs {
+			var port int
+			if network == "mainnet" {
+				port = 8333
+			} else {
+				port = 18333
+			}
+			tcpAddr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", addr, port))
+			if err == nil {
+				peerAddrs = append(peerAddrs, tcpAddr)
+			}
+		}
+	}
+
+	if len(peerAddrs) == 0 {
+		return "", fmt.Errorf("failed to discover any Bitcoin peers")
+	}
+
+	// Connect to a few peers (limit to 3 for efficiency)
+	maxPeers := 3
+	if len(peerAddrs) > maxPeers {
+		peerAddrs = peerAddrs[:maxPeers]
+	}
+
+	Logf("Connecting to %d Bitcoin P2P peers...", len(peerAddrs))
+
+	// Set up global message listener for all peers
+	globalListeners := peer.MessageListeners{
+		OnTx: func(p *peer.Peer, msg *wire.MsgTx) {
+			txHash := msg.TxHash()
+			txID := txHash.String()
+
+			// Check if anyone is waiting for this transaction
+			_p2p_pending_mu.RLock()
+			if txChan, ok := _p2p_pending_txs[txID]; ok {
+				_p2p_pending_mu.RUnlock()
+				select {
+				case txChan <- msg:
+				default:
+				}
+				// Remove from pending
+				_p2p_pending_mu.Lock()
+				delete(_p2p_pending_txs, txID)
+				_p2p_pending_mu.Unlock()
+			} else {
+				_p2p_pending_mu.RUnlock()
+			}
+
+			// Cache the transaction
+			_p2p_cache_mu.Lock()
+			_p2p_tx_cache[txID] = msg
+			_p2p_cache_mu.Unlock()
+		},
+	}
+
+	// Connect to peers
+	connectedPeers := 0
+	for _, addr := range peerAddrs {
+		cfg := &peer.Config{
+			UserAgentName:    "BBMTLib",
+			UserAgentVersion: "1.0",
+			ChainParams:      params,
+			Services:         wire.SFNodeNetwork,
+			Listeners:        globalListeners,
+		}
+
+		p, err := peer.NewOutboundPeer(cfg, addr.String())
+		if err != nil {
+			Logf("Failed to create peer for %s: %v", addr, err)
+			continue
+		}
+
+		// Connect to peer
+		conn, err := net.Dial("tcp", addr.String())
+		if err != nil {
+			Logf("Failed to dial %s: %v", addr, err)
+			continue
+		}
+
+		// Associate connection with peer
+		p.AssociateConnection(conn)
+
+		// Wait for handshake (check Connected() method)
+		connected := false
+		for i := 0; i < 100; i++ { // Check for up to 10 seconds
+			if p.Connected() {
+				connected = true
+				break
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+
+		if connected {
+			Logf("✓ Connected to peer: %s", addr)
+			_p2p_peers = append(_p2p_peers, p)
+			connectedPeers++
+		} else {
+			Logf("Timeout connecting to %s", addr)
+			p.Disconnect()
+		}
+	}
+
+	if connectedPeers == 0 {
+		return "", fmt.Errorf("failed to connect to any Bitcoin peers")
+	}
+
+	_use_p2p = true
+	return fmt.Sprintf("connected to %d Bitcoin P2P peers", connectedPeers), nil
+}
+
+// getP2PPeer returns an available P2P peer
+func getP2PPeer() (*peer.Peer, error) {
+	_p2p_peers_mu.RLock()
+	defer _p2p_peers_mu.RUnlock()
+
+	if len(_p2p_peers) == 0 {
+		return nil, fmt.Errorf("no P2P peers connected")
+	}
+
+	// Return first available peer
+	for _, p := range _p2p_peers {
+		if p != nil && p.Connected() {
+			return p, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no connected P2P peers available")
 }
 
 // FetchUTXOs fetches UTXOs for a given address
 func FetchUTXOs(address string) ([]UTXO, error) {
+	if _use_electrs {
+		return fetchUTXOsElectrs(address)
+	}
+	return fetchUTXOsAPI(address)
+}
+
+// fetchUTXOsAPI fetches UTXOs using mempool.space API
+func fetchUTXOsAPI(address string) ([]UTXO, error) {
 	url := fmt.Sprintf("%s/address/%s/utxo", _api_url, address)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -91,6 +457,57 @@ func FetchUTXOs(address string) ([]UTXO, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&utxos); err != nil {
 		return nil, fmt.Errorf("failed to parse UTXO response: %w", err)
 	}
+	return utxos, nil
+}
+
+// fetchUTXOsElectrs fetches UTXOs using Electrs HTTP REST API
+func fetchUTXOsElectrs(address string) ([]UTXO, error) {
+	if _electrs_url == "" {
+		return nil, fmt.Errorf("Electrs server not configured")
+	}
+
+	// Electrs REST API: GET /addrs/:address/utxo
+	url := fmt.Sprintf("%s/addrs/%s/utxo", _electrs_url, address)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch UTXOs from Electrs: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("Electrs server error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	// Electrs returns a different format, parse it
+	var electrsUTXOs []struct {
+		TxID         string  `json:"txid"`
+		Vout         uint32  `json:"vout"`
+		Value        float64 `json:"value"`    // in BTC
+		Satoshis     int64   `json:"satoshis"` // in satoshis (preferred)
+		ScriptPubKey string  `json:"scriptPubKey"`
+		Height       int     `json:"height"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&electrsUTXOs); err != nil {
+		return nil, fmt.Errorf("failed to parse Electrs UTXO response: %w", err)
+	}
+
+	// Convert to our UTXO format
+	utxos := make([]UTXO, 0, len(electrsUTXOs))
+	for _, e := range electrsUTXOs {
+		value := e.Satoshis
+		if value == 0 && e.Value > 0 {
+			// Fallback: convert BTC to satoshis
+			value = int64(e.Value * 100000000)
+		}
+		utxos = append(utxos, UTXO{
+			TxID:  e.TxID,
+			Vout:  e.Vout,
+			Value: value,
+		})
+	}
+
 	return utxos, nil
 }
 
@@ -118,6 +535,14 @@ func TotalUTXO(address string) (result string, err error) {
 }
 
 func FetchUTXODetails(txID string, vout uint32) (*wire.TxOut, bool, error) {
+	if _use_p2p {
+		return fetchUTXODetailsP2P(txID, vout)
+	}
+	return fetchUTXODetailsAPI(txID, vout)
+}
+
+// fetchUTXODetailsAPI fetches UTXO details using mempool.space API
+func fetchUTXODetailsAPI(txID string, vout uint32) (*wire.TxOut, bool, error) {
 	url := fmt.Sprintf("%s/tx/%s", _api_url, txID)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -145,6 +570,74 @@ func FetchUTXODetails(txID string, vout uint32) (*wire.TxOut, bool, error) {
 	}
 
 	return nil, false, fmt.Errorf("invalid vout for txID %s", txID)
+}
+
+// fetchUTXODetailsP2P fetches transaction details directly from Bitcoin P2P network
+func fetchUTXODetailsP2P(txID string, vout uint32) (*wire.TxOut, bool, error) {
+	// Check cache first
+	_p2p_cache_mu.RLock()
+	if cachedTx, ok := _p2p_tx_cache[txID]; ok {
+		_p2p_cache_mu.RUnlock()
+		if vout < uint32(len(cachedTx.TxOut)) {
+			txOut := cachedTx.TxOut[vout]
+			isWitness := txscript.IsWitnessProgram(txOut.PkScript)
+			return txOut, isWitness, nil
+		}
+		return nil, false, fmt.Errorf("invalid vout %d for txID %s", vout, txID)
+	}
+	_p2p_cache_mu.RUnlock()
+
+	// Get a peer
+	p, err := getP2PPeer()
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to get P2P peer: %w", err)
+	}
+
+	// Parse transaction hash
+	txHash, err := chainhash.NewHashFromStr(txID)
+	if err != nil {
+		return nil, false, fmt.Errorf("invalid transaction hash: %w", err)
+	}
+
+	// Create channel to receive transaction
+	txChan := make(chan *wire.MsgTx, 1)
+
+	// Register this request
+	_p2p_pending_mu.Lock()
+	_p2p_pending_txs[txID] = txChan
+	_p2p_pending_mu.Unlock()
+
+	// Cleanup function
+	defer func() {
+		_p2p_pending_mu.Lock()
+		delete(_p2p_pending_txs, txID)
+		_p2p_pending_mu.Unlock()
+	}()
+
+	// Request transaction using getdata
+	invVect := wire.NewInvVect(wire.InvTypeTx, txHash)
+	getData := wire.NewMsgGetData()
+	getData.AddInvVect(invVect)
+	p.QueueMessage(getData, nil)
+
+	// Wait for transaction with timeout
+	timeout := time.After(30 * time.Second)
+	select {
+	case tx := <-txChan:
+		// Check vout
+		if vout >= uint32(len(tx.TxOut)) {
+			return nil, false, fmt.Errorf("invalid vout %d for txID %s", vout, txID)
+		}
+
+		txOut := tx.TxOut[vout]
+		isWitness := txscript.IsWitnessProgram(txOut.PkScript)
+		return txOut, isWitness, nil
+
+	case <-timeout:
+		// Fallback to API if P2P times out
+		Logf("P2P timeout, falling back to API for tx %s", txID)
+		return fetchUTXODetailsAPI(txID, vout)
+	}
 }
 
 func RecommendedFees(feeType string) (int, error) {
@@ -179,6 +672,14 @@ func RecommendedFees(feeType string) (int, error) {
 }
 
 func PostTx(rawTxHex string) (string, error) {
+	if _use_p2p {
+		return postTxP2P(rawTxHex)
+	}
+	return postTxAPI(rawTxHex)
+}
+
+// postTxAPI broadcasts transaction using mempool.space API
+func postTxAPI(rawTxHex string) (string, error) {
 	// Define the Blockstream API endpoint for broadcasting transactions
 	url := fmt.Sprintf("%s/tx", _api_url)
 
@@ -213,6 +714,46 @@ func PostTx(rawTxHex string) (string, error) {
 
 	// Return the txid as a string
 	return string(txid), nil
+}
+
+// postTxP2P broadcasts transaction directly to Bitcoin P2P network
+func postTxP2P(rawTxHex string) (string, error) {
+	// Decode hex transaction
+	txBytes, err := hex.DecodeString(rawTxHex)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode transaction hex: %w", err)
+	}
+
+	// Deserialize transaction
+	var msgTx wire.MsgTx
+	if err := msgTx.Deserialize(bytes.NewReader(txBytes)); err != nil {
+		return "", fmt.Errorf("failed to deserialize transaction: %w", err)
+	}
+
+	// Get transaction hash
+	txHash := msgTx.TxHash()
+	txID := txHash.String()
+
+	// Broadcast to all connected peers
+	_p2p_peers_mu.RLock()
+	peers := make([]*peer.Peer, len(_p2p_peers))
+	copy(peers, _p2p_peers)
+	_p2p_peers_mu.RUnlock()
+
+	broadcastCount := 0
+	for _, p := range peers {
+		if p != nil && p.Connected() {
+			p.QueueMessage(&msgTx, nil)
+			broadcastCount++
+		}
+	}
+
+	if broadcastCount == 0 {
+		return "", fmt.Errorf("no connected peers to broadcast to")
+	}
+
+	Logf("Broadcasted transaction to %d P2P peers", broadcastCount)
+	return txID, nil
 }
 
 // SelectUTXOs selects the optimal set of UTXOs based on the strategy
