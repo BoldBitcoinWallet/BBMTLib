@@ -121,6 +121,6 @@ Test with the following scripts:
 
 I've been trying to find ways to improve this by testing out different MPC TSS libraries like https://github.com/0xCarbon/DKLs23.
 
-But I am hesitant. While the 0xCarbon's DKLs23 library is complete for secpk1, it has not undergone any 3rd party review. At least the current library we use https://github.com/bnb-chain/tss-lib has been in use for 7 years and has completed a security audit in 2019 https://github.com/bnb-chain/tss-lib.
+But I am hesitant. While the 0xCarbon's DKLs23 library is complete for secpk1, it has not undergone any 3rd party review. At least the current library we use https://github.com/bnb-chain/tss-lib has been in use for 7 years and has completed a security audit in 2019.
 
 Until we find a more proven, production ready TSS library, we will just stick with the current one.
