@@ -5,6 +5,7 @@ It does up to 10-20 party keygens over nostr pretty decently.
 
 The only limitation is that the more parties you involve, the more data is transmitted over nostr because each party needs to do a some rounds of computation and send them back to each party.  
 A 10 party keygen completes in 45 seconds, and a keysign completes in 35 seconds. Not too shabby.
+You just have to be mindful of which nostr relay you are using. If you send too many messages too fast, you will be rate-limited.
 
 Feel free to test the scripts yourself in this branch, just reach out if you have questions.
 https://github.com/BoldBitcoinWallet/BBMTLib/tree/Experimental-20-party-script
